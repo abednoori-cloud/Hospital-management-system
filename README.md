@@ -6,17 +6,39 @@ A complete, production-style **Hospital Management System** built with **Java 21
 
 ---
 
+## 🔐 Security & Role-Based Access Control
+
+This isn't just "login required" — every role sees a genuinely different application, enforced at three layers:
+
+| Layer | How it's enforced |
+|---|---|
+| **URL-level** | `SecurityConfig` restricts whole modules per role (e.g. `/medical-records/**` → ADMIN + DOCTOR only, RECEPTIONIST gets a 403) |
+| **Action-level** | `@PreAuthorize` on individual controller methods (e.g. only ADMIN can delete a doctor; only RECEPTIONIST can create an invoice) |
+| **Object-level** | A DOCTOR can only view/edit *their own* patients, appointments, and medical records — verified against the data, not just the role |
+| **UI-level** | `sec:authorize` in Thymeleaf hides buttons/menu items a user isn't allowed to use, so no one even sees a "Delete Doctor" button they can't click |
+
+**Permission matrix:**
+
+| Role | Can | Cannot |
+|---|---|---|
+| **ADMIN** | Manage users, doctors, receptionists, patients; view all appointments/invoices/medical records; reports; hospital settings | Write diagnoses or prescriptions |
+| **DOCTOR** | View assigned patients & own appointments; create/update medical records, diagnoses, prescriptions; complete appointments | Register/delete patients; manage doctors/users; create invoices; view reports/settings |
+| **RECEPTIONIST** | Register/edit patients; schedule/cancel appointments; create/print invoices; search patients | Manage doctors/users; medical records; diagnoses/prescriptions; reports/settings |
+
+Each role also gets its own dashboard (e.g. ADMIN sees hospital-wide revenue and an appointment-status chart; DOCTOR sees today's schedule and recent records; RECEPTIONIST sees today's bookings and waiting patients) and its own sidebar navigation.
+
+---
+
 ## ✨ Features
 
 ### Authentication & Security
 - Login / logout / registration with **Spring Security** session-based auth
 - **BCrypt** password hashing
-- Role-based access control: **ADMIN**, **DOCTOR**, **RECEPTIONIST**
+- Full role-based access control: **ADMIN**, **DOCTOR**, **RECEPTIONIST** (see above)
 - Custom `UserDetailsService`, global access-denied and error pages
 
 ### Dashboard
-- Live stat cards: total patients, total doctors, today's appointments, total appointments
-- Recent activity feed of the latest appointments
+- Three distinct dashboards, one per role (see Security section above)
 
 ### Patient Management
 - Add / edit / delete / view patients, with pagination and keyword search
@@ -41,7 +63,7 @@ A complete, production-style **Hospital Management System** built with **Java 21
 - Printable receipt view
 
 ### Global Search
-- Single search box in the navbar that queries patients, doctors, and appointments at once
+- Single search box in the navbar that queries patients, doctors, and appointments at once (results scoped per role)
 
 ### Validation & Error Handling
 - Bean Validation (`jakarta.validation`) on every form
