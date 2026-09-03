@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${medicalRecordDto.id} != null ? 'Edit Medical Record' : 'Add Medical Record')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></div>
+    <main class="main-content">
+        <div th:replace="~{fragments/navbar :: navbar}"></div>
+        <div class="page-body">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+            <div class="page-header">
+                <div>
+                    <h1 th:text="${medicalRecordDto.id} != null ? 'Edit Medical Record' : 'Add Medical Record'">Add Medical Record</h1>
+                    <p class="text-muted">Record diagnosis, prescription, and doctor's notes for a patient visit.</p>
+                </div>
+                <a th:href="@{/medical-records}" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Back to list</a>
+            </div>
+
+            <div class="card-panel form-panel">
+                <form th:action="${medicalRecordDto.id} != null ? @{/medical-records/{id}(id=${medicalRecordDto.id})} : @{/medical-records}"
+                      th:object="${medicalRecordDto}" method="post">
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="patientId">Patient *</label>
+                            <select id="patientId" th:field="*{patientId}" class="form-select">
+                                <option value="">Select patient</option>
+                                <option th:each="p : ${patients}" th:value="${p.id}" th:text="${p.fullName}">Patient</option>
+                            </select>
+                            <div class="field-error" th:if="${#fields.hasErrors('patientId')}" th:errors="*{patientId}"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="doctorId">Doctor *</label>
+                            <select id="doctorId" th:field="*{doctorId}" class="form-select">
+                                <option value="">Select doctor</option>
+                                <option th:each="d : ${doctors}" th:value="${d.id}" th:text="${d.fullName}">Doctor</option>
+                            </select>
+                            <div class="field-error" th:if="${#fields.hasErrors('doctorId')}" th:errors="*{doctorId}"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="visitDate">Visit Date *</label>
+                            <input type="date" id="visitDate" th:field="*{visitDate}" class="form-control"/>
+                            <div class="field-error" th:if="${#fields.hasErrors('visitDate')}" th:errors="*{visitDate}"></div>
+                        </div>
+                        <div class="form-group form-group-full">
+                            <label for="diagnosis">Diagnosis *</label>
+                            <textarea id="diagnosis" th:field="*{diagnosis}" class="form-control" rows="2"></textarea>
+                            <div class="field-error" th:if="${#fields.hasErrors('diagnosis')}" th:errors="*{diagnosis}"></div>
+                        </div>
+                        <div class="form-group form-group-full">
+                            <label for="prescription">Prescription</label>
+                            <textarea id="prescription" th:field="*{prescription}" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="form-group form-group-full">
+                            <label for="doctorNotes">Doctor Notes</label>
+                            <textarea id="doctorNotes" th:field="*{doctorNotes}" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save Record</button>
+                        <a th:href="@{/medical-records}" class="btn btn-outline">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/scripts.js}"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Doctor Details')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></div>
+    <main class="main-content">
+        <div th:replace="~{fragments/navbar :: navbar}"></div>
+        <div class="page-body">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+            <div class="page-header">
+                <div>
+                    <h1 th:text="${doctor.fullName}">Doctor Name</h1>
+                    <p class="text-muted" th:text="${doctor.specialization}">Specialization</p>
+                </div>
+                <div class="header-actions">
+                    <a th:href="@{/doctors/{id}/edit(id=${doctor.id})}" class="btn btn-outline" sec:authorize="hasRole('ADMIN')"><i class="fa-solid fa-pen"></i> Edit</a>
+                    <a th:href="@{/doctors}" class="btn btn-primary"><i class="fa-solid fa-arrow-left"></i> Back</a>
+                </div>
+            </div>
+
+            <div class="detail-grid">
+                <div class="card-panel">
+                    <div class="card-panel-header"><h2><i class="fa-solid fa-id-card"></i> Profile</h2></div>
+                    <dl class="detail-list">
+                        <dt>Email</dt><dd th:text="${doctor.email}">Email</dd>
+                        <dt>Phone</dt><dd th:text="${doctor.phoneNumber}">Phone</dd>
+                        <dt>Department</dt><dd th:text="${doctor.department} ?: '—'">Dept</dd>
+                        <dt>Experience</dt><dd th:text="${doctor.yearsOfExperience} + ' years'">Exp</dd>
+                        <dt>Consultation Fee</dt><dd th:text="'$' + ${doctor.consultationFee}">Fee</dd>
+                        <dt>Availability</dt>
+                        <dd>
+                            <span class="badge" th:classappend="${doctor.available} ? 'badge-SCHEDULED' : 'badge-CANCELLED'"
+                                  th:text="${doctor.available} ? 'Available' : 'Unavailable'">Status</span>
+                        </dd>
+                    </dl>
+                </div>
+
+                <div class="card-panel">
+                    <div class="card-panel-header"><h2><i class="fa-solid fa-calendar-check"></i> Upcoming Appointments</h2></div>
+                    <ul class="simple-list">
+                        <li th:each="a : ${doctor.appointments}">
+                            <span th:text="${#temporals.format(a.appointmentDateTime, 'dd MMM yyyy, hh:mm a')}">Date</span>
+                            — <strong th:text="${a.patient.fullName}">Patient</strong>
+                            <span class="badge" th:classappend="'badge-' + ${a.status}" th:text="${a.status}">Status</span>
+                        </li>
+                        <li th:if="${#lists.isEmpty(doctor.appointments)}" class="text-muted">No appointments yet.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/scripts.js}"></script>
+</body>
+</html>

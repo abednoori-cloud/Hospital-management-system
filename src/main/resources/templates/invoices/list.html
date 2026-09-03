@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Billing')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></div>
+    <main class="main-content">
+        <div th:replace="~{fragments/navbar :: navbar}"></div>
+        <div class="page-body">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+            <div class="page-header">
+                <div>
+                    <h1>Billing &amp; Invoices</h1>
+                    <p class="text-muted">Generate invoices and track payment status for treatments.</p>
+                </div>
+                <a th:href="@{/invoices/new}" class="btn btn-primary" sec:authorize="hasRole('RECEPTIONIST')"><i class="fa-solid fa-plus"></i> New Invoice</a>
+            </div>
+
+            <div class="card-panel">
+                <form th:action="@{/invoices}" method="get" class="toolbar-search">
+                    <input type="text" name="keyword" th:value="${keyword}" placeholder="Search by patient or treatment..." class="form-control"/>
+                    <button type="submit" class="btn btn-outline"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+                </form>
+
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Invoice #</th>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Date</th>
+                            <th>Treatment</th>
+                            <th>Cost</th>
+                            <th>Payment</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="inv : ${invoicePage.content}">
+                            <td><a th:href="@{/invoices/{id}(id=${inv.id})}" th:text="${inv.invoiceNumber}">INV-000001</a></td>
+                            <td th:text="${inv.patient.fullName}">Patient</td>
+                            <td th:text="${inv.doctor != null ? inv.doctor.fullName : '—'}">Doctor</td>
+                            <td th:text="${#temporals.format(inv.invoiceDate, 'dd MMM yyyy')}">Date</td>
+                            <td th:text="${inv.treatmentDescription}">Treatment</td>
+                            <td th:text="'$' + ${inv.treatmentCost}">$0</td>
+                            <td><span class="badge" th:classappend="'badge-pay-' + ${inv.paymentStatus}" th:text="${inv.paymentStatus}">Status</span></td>
+                            <td class="text-end actions-cell">
+                                <a th:href="@{/invoices/{id}(id=${inv.id})}" class="btn-icon" title="View / Receipt"><i class="fa-solid fa-receipt"></i></a>
+                                <a th:href="@{/invoices/{id}/edit(id=${inv.id})}" class="btn-icon" title="Edit" sec:authorize="hasRole('RECEPTIONIST')"><i class="fa-solid fa-pen"></i></a>
+                                <form th:action="@{/invoices/{id}/delete(id=${inv.id})}" method="post" class="d-inline" sec:authorize="hasRole('ADMIN')"
+                                      onsubmit="return confirm('Delete this invoice? This cannot be undone.');">
+                                    <button type="submit" class="btn-icon btn-icon-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(invoicePage.content)}">
+                            <td colspan="8" class="text-center text-muted">No invoices found.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:replace="~{fragments/pagination :: pagination(${invoicePage}, '/invoices')}"></div>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/scripts.js}"></script>
+</body>
+</html>

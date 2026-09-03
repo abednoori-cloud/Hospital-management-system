@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${selectedRole} != null ? 'Receptionists' : 'Users')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></div>
+    <main class="main-content">
+        <div th:replace="~{fragments/navbar :: navbar}"></div>
+        <div class="page-body">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+            <div class="page-header">
+                <div>
+                    <h1 th:text="${selectedRole} != null ? 'Receptionists' : 'User Accounts'">Users</h1>
+                    <p class="text-muted">Manage login accounts, roles, and access.</p>
+                </div>
+                <div class="header-actions">
+                    <a th:href="@{/register}" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> New Account</a>
+                </div>
+            </div>
+
+            <div class="card-panel">
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Full Name</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Linked Doctor</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="u : ${users}">
+                            <td th:text="${u.id}">1</td>
+                            <td th:text="${u.fullName}">Name</td>
+                            <td th:text="${u.username}">username</td>
+                            <td th:text="${u.email}">email</td>
+                            <td><span class="badge" th:text="${u.role}">ROLE</span></td>
+                            <td th:text="${u.doctorProfile != null ? u.doctorProfile.fullName : '—'}">—</td>
+                            <td>
+                                <span class="badge" th:classappend="${u.enabled} ? 'badge-SCHEDULED' : 'badge-CANCELLED'"
+                                      th:text="${u.enabled} ? 'Active' : 'Disabled'">Status</span>
+                            </td>
+                            <td class="text-end actions-cell">
+                                <a th:href="@{/users/{id}/edit(id=${u.id})}" class="btn-icon" title="Edit"><i class="fa-solid fa-pen"></i></a>
+                                <form th:action="@{/users/{id}/delete(id=${u.id})}" method="post" class="d-inline"
+                                      onsubmit="return confirm('Delete this user account? This cannot be undone.');">
+                                    <button type="submit" class="btn-icon btn-icon-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(users)}">
+                            <td colspan="8" class="text-center text-muted">No user accounts found.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/scripts.js}"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<header class="topbar" th:fragment="navbar">
+    <button class="sidebar-toggle" type="button" aria-label="Toggle sidebar">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <form class="global-search" th:action="@{/search}" method="get">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="search" name="query" placeholder="Search patients, doctors, appointments..." autocomplete="off"/>
+    </form>
+
+    <div class="topbar-right">
+        <div class="user-chip dropdown">
+            <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="avatar" sec:authentication="name">U</span>
+                <span class="user-meta">
+                    <strong sec:authentication="name">User</strong>
+                    <small sec:authentication="authorities">ROLE</small>
+                </span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="dropdown-item">
+                            <i class="fa-solid fa-right-from-bracket"></i> Logout
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header>
+</body>
+</html>

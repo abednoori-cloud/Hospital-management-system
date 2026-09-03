@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${invoiceDto.id} != null ? 'Edit Invoice' : 'New Invoice')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></div>
+    <main class="main-content">
+        <div th:replace="~{fragments/navbar :: navbar}"></div>
+        <div class="page-body">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+            <div class="page-header">
+                <div>
+                    <h1 th:text="${invoiceDto.id} != null ? 'Edit Invoice' : 'New Invoice'">New Invoice</h1>
+                    <p class="text-muted">Generate a bill for a treatment or consultation.</p>
+                </div>
+                <a th:href="@{/invoices}" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Back to list</a>
+            </div>
+
+            <div class="card-panel form-panel">
+                <form th:action="${invoiceDto.id} != null ? @{/invoices/{id}(id=${invoiceDto.id})} : @{/invoices}"
+                      th:object="${invoiceDto}" method="post">
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="patientId">Patient *</label>
+                            <select id="patientId" th:field="*{patientId}" class="form-select">
+                                <option value="">Select patient</option>
+                                <option th:each="p : ${patients}" th:value="${p.id}" th:text="${p.fullName}">Patient</option>
+                            </select>
+                            <div class="field-error" th:if="${#fields.hasErrors('patientId')}" th:errors="*{patientId}"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="doctorId">Doctor (optional)</label>
+                            <select id="doctorId" th:field="*{doctorId}" class="form-select">
+                                <option value="">Not specified</option>
+                                <option th:each="d : ${doctors}" th:value="${d.id}" th:text="${d.fullName}">Doctor</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="invoiceDate">Invoice Date *</label>
+                            <input type="date" id="invoiceDate" th:field="*{invoiceDate}" class="form-control"/>
+                            <div class="field-error" th:if="${#fields.hasErrors('invoiceDate')}" th:errors="*{invoiceDate}"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="treatmentCost">Treatment Cost ($) *</label>
+                            <input type="number" step="0.01" min="0" id="treatmentCost" th:field="*{treatmentCost}" class="form-control"/>
+                            <div class="field-error" th:if="${#fields.hasErrors('treatmentCost')}" th:errors="*{treatmentCost}"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="paymentStatus">Payment Status</label>
+                            <select id="paymentStatus" th:field="*{paymentStatus}" class="form-select">
+                                <option th:each="s : ${paymentStatuses}" th:value="${s}" th:text="${s}">STATUS</option>
+                            </select>
+                        </div>
+                        <div class="form-group form-group-full">
+                            <label for="treatmentDescription">Treatment Description *</label>
+                            <textarea id="treatmentDescription" th:field="*{treatmentDescription}" class="form-control" rows="2"></textarea>
+                            <div class="field-error" th:if="${#fields.hasErrors('treatmentDescription')}" th:errors="*{treatmentDescription}"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save Invoice</button>
+                        <a th:href="@{/invoices}" class="btn btn-outline">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/scripts.js}"></script>
+</body>
+</html>

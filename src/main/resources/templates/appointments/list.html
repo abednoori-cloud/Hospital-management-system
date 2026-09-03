@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Appointments')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></div>
+    <main class="main-content">
+        <div th:replace="~{fragments/navbar :: navbar}"></div>
+        <div class="page-body">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+            <div class="page-header">
+                <div>
+                    <h1>Appointments</h1>
+                    <p class="text-muted">Book, track, and manage patient appointments.</p>
+                </div>
+                <a th:href="@{/appointments/new}" class="btn btn-primary" sec:authorize="hasAnyRole('ADMIN','RECEPTIONIST')"><i class="fa-solid fa-plus"></i> Book Appointment</a>
+            </div>
+
+            <div class="card-panel">
+                <form th:action="@{/appointments}" method="get" class="toolbar-search">
+                    <input type="text" name="keyword" th:value="${keyword}" placeholder="Search by patient, doctor, or department..." class="form-control"/>
+                    <select name="status" class="form-select toolbar-select" onchange="this.form.submit()">
+                        <option value="">All Statuses</option>
+                        <option th:each="s : ${statuses}" th:value="${s}" th:selected="${s == selectedStatus}" th:text="${s}">STATUS</option>
+                    </select>
+                    <button type="submit" class="btn btn-outline"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+                </form>
+
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Department</th>
+                            <th>Date &amp; Time</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="a : ${appointmentPage.content}">
+                            <td th:text="${a.id}">1</td>
+                            <td th:text="${a.patient.fullName}">Patient</td>
+                            <td th:text="${a.doctor.fullName}">Doctor</td>
+                            <td th:text="${a.doctor.department} ?: '—'">Dept</td>
+                            <td th:text="${#temporals.format(a.appointmentDateTime, 'dd MMM yyyy, hh:mm a')}">Date</td>
+                            <td th:text="${a.reason} ?: '—'">Reason</td>
+                            <td><span class="badge" th:classappend="'badge-' + ${a.status}" th:text="${a.status}">Status</span></td>
+                            <td class="text-end actions-cell">
+                                <a th:href="@{/appointments/{id}/edit(id=${a.id})}" class="btn-icon" title="Edit" sec:authorize="hasAnyRole('ADMIN','RECEPTIONIST')"><i class="fa-solid fa-pen"></i></a>
+                                <form th:if="${a.status.name() == 'SCHEDULED'}" sec:authorize="hasRole('DOCTOR')" th:action="@{/appointments/{id}/complete(id=${a.id})}" method="post" class="d-inline"
+                                      onsubmit="return confirm('Mark this appointment as completed?');">
+                                    <button type="submit" class="btn-icon btn-icon-success" title="Complete"><i class="fa-solid fa-check"></i></button>
+                                </form>
+                                <form th:if="${a.status.name() == 'SCHEDULED'}" sec:authorize="hasAnyRole('ADMIN','RECEPTIONIST')" th:action="@{/appointments/{id}/cancel(id=${a.id})}" method="post" class="d-inline"
+                                      onsubmit="return confirm('Cancel this appointment?');">
+                                    <button type="submit" class="btn-icon btn-icon-warning" title="Cancel"><i class="fa-solid fa-ban"></i></button>
+                                </form>
+                                <form th:action="@{/appointments/{id}/delete(id=${a.id})}" method="post" class="d-inline" sec:authorize="hasRole('ADMIN')"
+                                      onsubmit="return confirm('Delete this appointment? This cannot be undone.');">
+                                    <button type="submit" class="btn-icon btn-icon-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(appointmentPage.content)}">
+                            <td colspan="8" class="text-center text-muted">No appointments found.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:replace="~{fragments/pagination :: pagination(${appointmentPage}, '/appointments')}"></div>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/scripts.js}"></script>
+</body>
+</html>

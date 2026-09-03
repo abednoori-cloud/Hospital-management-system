@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${appointmentDto.id} != null ? 'Edit Appointment' : 'Book Appointment')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></div>
+    <main class="main-content">
+        <div th:replace="~{fragments/navbar :: navbar}"></div>
+        <div class="page-body">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+            <div class="page-header">
+                <div>
+                    <h1 th:text="${appointmentDto.id} != null ? 'Edit Appointment' : 'Book Appointment'">Book Appointment</h1>
+                    <p class="text-muted">Schedule a patient visit with an available doctor.</p>
+                </div>
+                <a th:href="@{/appointments}" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Back to list</a>
+            </div>
+
+            <div class="card-panel form-panel">
+                <form th:action="${appointmentDto.id} != null ? @{/appointments/{id}(id=${appointmentDto.id})} : @{/appointments}"
+                      th:object="${appointmentDto}" method="post">
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="patientId">Patient *</label>
+                            <select id="patientId" th:field="*{patientId}" class="form-select">
+                                <option value="">Select patient</option>
+                                <option th:each="p : ${patients}" th:value="${p.id}" th:text="${p.fullName} + ' (' + ${p.phoneNumber} + ')'">Patient</option>
+                            </select>
+                            <div class="field-error" th:if="${#fields.hasErrors('patientId')}" th:errors="*{patientId}"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="doctorId">Doctor *</label>
+                            <select id="doctorId" th:field="*{doctorId}" class="form-select">
+                                <option value="">Select doctor</option>
+                                <option th:each="d : ${doctors}" th:value="${d.id}" th:text="${d.fullName} + ' — ' + ${d.specialization}">Doctor</option>
+                            </select>
+                            <div class="field-error" th:if="${#fields.hasErrors('doctorId')}" th:errors="*{doctorId}"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="appointmentDateTime">Date &amp; Time *</label>
+                            <input type="datetime-local" id="appointmentDateTime" th:field="*{appointmentDateTime}" class="form-control"/>
+                            <div class="field-error" th:if="${#fields.hasErrors('appointmentDateTime')}" th:errors="*{appointmentDateTime}"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select id="status" th:field="*{status}" class="form-select">
+                                <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}">STATUS</option>
+                            </select>
+                        </div>
+                        <div class="form-group form-group-full">
+                            <label for="reason">Reason for Visit</label>
+                            <input type="text" id="reason" th:field="*{reason}" class="form-control" placeholder="e.g. Routine checkup"/>
+                        </div>
+                        <div class="form-group form-group-full">
+                            <label for="notes">Notes</label>
+                            <textarea id="notes" th:field="*{notes}" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save Appointment</button>
+                        <a th:href="@{/appointments}" class="btn btn-outline">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/scripts.js}"></script>
+</body>
+</html>

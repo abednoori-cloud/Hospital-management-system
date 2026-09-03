@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Patient Details')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></div>
+    <main class="main-content">
+        <div th:replace="~{fragments/navbar :: navbar}"></div>
+        <div class="page-body">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+            <div class="page-header">
+                <div>
+                    <h1 th:text="${patient.fullName}">Patient Name</h1>
+                    <p class="text-muted">Patient ID #<span th:text="${patient.id}">1</span></p>
+                </div>
+                <div class="header-actions">
+                    <a th:href="@{/patients/{id}/edit(id=${patient.id})}" class="btn btn-outline" sec:authorize="hasAnyRole('ADMIN','RECEPTIONIST')"><i class="fa-solid fa-pen"></i> Edit</a>
+                    <a th:href="@{/patients}" class="btn btn-primary"><i class="fa-solid fa-arrow-left"></i> Back</a>
+                </div>
+            </div>
+
+            <div class="detail-grid">
+                <div class="card-panel">
+                    <div class="card-panel-header"><h2><i class="fa-solid fa-id-card"></i> Personal Information</h2></div>
+                    <dl class="detail-list">
+                        <dt>Full Name</dt><dd th:text="${patient.fullName}">Name</dd>
+                        <dt>Email</dt><dd th:text="${patient.email}">Email</dd>
+                        <dt>Phone</dt><dd th:text="${patient.phoneNumber}">Phone</dd>
+                        <dt>Date of Birth</dt><dd th:text="${#temporals.format(patient.dateOfBirth, 'dd MMM yyyy')}">DOB</dd>
+                        <dt>Age</dt><dd th:text="${patient.age} + ' years'">Age</dd>
+                        <dt>Gender</dt><dd th:text="${patient.gender}">Gender</dd>
+                        <dt>Blood Group</dt><dd th:text="${patient.bloodGroup} ?: '—'">O+</dd>
+                        <dt>Emergency Contact</dt><dd th:text="${patient.emergencyContact} ?: '—'">Contact</dd>
+                        <dt>Address</dt><dd th:text="${patient.address} ?: '—'">Address</dd>
+                    </dl>
+                </div>
+
+                <div class="card-panel">
+                    <div class="card-panel-header"><h2><i class="fa-solid fa-calendar-check"></i> Appointments</h2></div>
+                    <ul class="simple-list">
+                        <li th:each="a : ${patient.appointments}">
+                            <span th:text="${#temporals.format(a.appointmentDateTime, 'dd MMM yyyy, hh:mm a')}">Date</span>
+                            with <strong th:text="${a.doctor.fullName}">Doctor</strong>
+                            <span class="badge" th:classappend="'badge-' + ${a.status}" th:text="${a.status}">Status</span>
+                        </li>
+                        <li th:if="${#lists.isEmpty(patient.appointments)}" class="text-muted">No appointments yet.</li>
+                    </ul>
+                </div>
+
+                <div class="card-panel" sec:authorize="hasAnyRole('ADMIN','DOCTOR')">
+                    <div class="card-panel-header"><h2><i class="fa-solid fa-file-waveform"></i> Medical Records</h2></div>
+                    <ul class="simple-list">
+                        <li th:each="m : ${patient.medicalRecords}">
+                            <span th:text="${#temporals.format(m.visitDate, 'dd MMM yyyy')}">Date</span> —
+                            <strong th:text="${m.diagnosis}">Diagnosis</strong>
+                            (<span th:text="${m.doctor.fullName}">Doctor</span>)
+                        </li>
+                        <li th:if="${#lists.isEmpty(patient.medicalRecords)}" class="text-muted">No medical records yet.</li>
+                    </ul>
+                </div>
+
+                <div class="card-panel" sec:authorize="hasAnyRole('ADMIN','RECEPTIONIST')">
+                    <div class="card-panel-header"><h2><i class="fa-solid fa-file-invoice-dollar"></i> Invoices</h2></div>
+                    <ul class="simple-list">
+                        <li th:each="inv : ${patient.invoices}">
+                            <span th:text="${inv.invoiceNumber}">INV</span> —
+                            <strong th:text="'$' + ${inv.treatmentCost}">Cost</strong>
+                            <span class="badge" th:classappend="'badge-' + ${inv.paymentStatus}" th:text="${inv.paymentStatus}">Status</span>
+                        </li>
+                        <li th:if="${#lists.isEmpty(patient.invoices)}" class="text-muted">No invoices yet.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/scripts.js}"></script>
+</body>
+</html>

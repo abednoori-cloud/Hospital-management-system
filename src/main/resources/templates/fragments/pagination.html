@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav th:fragment="pagination(page, baseUrl)" th:if="${page.totalPages > 1}" aria-label="Page navigation">
+    <ul class="pagination justify-content-center mt-4">
+        <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+            <a class="page-link" th:href="@{${baseUrl}(page=${page.number - 1}, size=${page.size}, keyword=${keyword})}">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+        </li>
+        <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+            th:classappend="${i == page.number} ? 'active'">
+            <a class="page-link" th:href="@{${baseUrl}(page=${i}, size=${page.size}, keyword=${keyword})}" th:text="${i + 1}">1</a>
+        </li>
+        <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+            <a class="page-link" th:href="@{${baseUrl}(page=${page.number + 1}, size=${page.size}, keyword=${keyword})}">
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </li>
+    </ul>
+</nav>
+</body>
+</html>

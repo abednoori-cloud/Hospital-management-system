@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Dashboard')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></div>
+
+    <main class="main-content">
+        <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+        <div class="page-body">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+            <div class="page-header">
+                <div>
+                    <h1>Dashboard</h1>
+                    <p class="text-muted">Welcome back — here's what's happening at the hospital today.</p>
+                </div>
+            </div>
+
+            <!-- ================= ADMIN DASHBOARD ================= -->
+            <div th:if="${dashboardRole == 'ADMIN'}">
+                <div class="stat-grid">
+                    <div class="stat-card stat-blue">
+                        <div class="stat-icon"><i class="fa-solid fa-bed-pulse"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" th:text="${totalPatients}">0</span>
+                            <span class="stat-label">Total Patients</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-green">
+                        <div class="stat-icon"><i class="fa-solid fa-user-doctor"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" th:text="${totalDoctors}">0</span>
+                            <span class="stat-label">Total Doctors</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-purple">
+                        <div class="stat-icon"><i class="fa-solid fa-users-gear"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" th:text="${totalUsers}">0</span>
+                            <span class="stat-label">Total Users</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-amber">
+                        <div class="stat-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" th:text="'$' + ${revenue}">$0</span>
+                            <span class="stat-label">Revenue (Paid Invoices)</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-blue">
+                        <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" th:text="${totalAppointments}">0</span>
+                            <span class="stat-label">Total Appointments</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-panel">
+                    <div class="card-panel-header"><h2><i class="fa-solid fa-chart-column"></i> Appointments by Status</h2></div>
+                    <div class="chart-bars">
+                        <div class="chart-bar-row" th:each="entry : ${statusCounts}">
+                            <span class="chart-bar-label" th:text="${entry.key}">STATUS</span>
+                            <div class="chart-bar-track">
+                                <div class="chart-bar-fill" th:classappend="'badge-' + ${entry.key}"
+                                     th:style="'width: ' + (${entry.value} * 100 / ${maxStatusCount}) + '%'"></div>
+                            </div>
+                            <span class="chart-bar-value" th:text="${entry.value}">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-panel">
+                    <div class="card-panel-header"><h2><i class="fa-solid fa-clock-rotate-left"></i> Recent Activity</h2></div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                            <tr><th>Patient</th><th>Doctor</th><th>Date &amp; Time</th><th>Reason</th><th>Status</th></tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="a : ${recentAppointments}">
+                                <td th:text="${a.patient.fullName}">Patient</td>
+                                <td th:text="${a.doctor.fullName}">Doctor</td>
+                                <td th:text="${#temporals.format(a.appointmentDateTime, 'dd MMM yyyy, hh:mm a')}">Date</td>
+                                <td th:text="${a.reason}">Reason</td>
+                                <td><span class="badge" th:classappend="'badge-' + ${a.status}" th:text="${a.status}">Status</span></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(recentAppointments)}">
+                                <td colspan="5" class="text-center text-muted">No recent activity yet.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= DOCTOR DASHBOARD ================= -->
+            <div th:if="${dashboardRole == 'DOCTOR'}">
+                <div class="alert alert-danger" th:if="${unlinkedDoctorAccount}">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    Your account isn't linked to a clinical Doctor profile yet. Ask an administrator to link it
+                    from the Users screen so you can see your patients and appointments.
+                </div>
+
+                <div class="stat-grid">
+                    <div class="stat-card stat-blue">
+                        <div class="stat-icon"><i class="fa-solid fa-calendar-day"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" th:text="${todaysAppointments}">0</span>
+                            <span class="stat-label">Today's Appointments</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-green">
+                        <div class="stat-icon"><i class="fa-solid fa-bed-pulse"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" th:text="${assignedPatients}">0</span>
+                            <span class="stat-label">Assigned Patients</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-purple">
+                        <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" th:text="${completedVisits}">0</span>
+                            <span class="stat-label">Completed Visits</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-panel">
+                    <div class="card-panel-header"><h2><i class="fa-solid fa-file-waveform"></i> Recent Medical Records</h2></div>
+                    <ul class="simple-list">
+                        <li th:each="m : ${recentMedicalRecords}">
+                            <span th:text="${#temporals.format(m.visitDate, 'dd MMM yyyy')}">Date</span> —
+                            <strong th:text="${m.patient.fullName}">Patient</strong>:
+                            <span th:text="${m.diagnosis}">Diagnosis</span>
+                        </li>
+                        <li th:if="${#lists.isEmpty(recentMedicalRecords)}" class="text-muted">No medical records yet.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ================= RECEPTIONIST DASHBOARD ================= -->
+            <div th:if="${dashboardRole == 'RECEPTIONIST'}">
+                <div class="stat-grid">
+                    <div class="stat-card stat-blue">
+                        <div class="stat-icon"><i class="fa-solid fa-calendar-day"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" th:text="${todaysAppointments}">0</span>
+                            <span class="stat-label">Today's Appointments</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-amber">
+                        <div class="stat-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" th:text="${waitingPatients}">0</span>
+                            <span class="stat-label">Waiting Patients</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-green">
+                        <div class="stat-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" th:text="${todaysInvoices}">0</span>
+                            <span class="stat-label">Today's Invoices</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-panel">
+                    <div class="card-panel-header"><h2><i class="fa-solid fa-user-plus"></i> Recent Registrations</h2></div>
+                    <ul class="simple-list">
+                        <li th:each="p : ${recentRegistrations}">
+                            <a th:href="@{/patients/{id}(id=${p.id})}" th:text="${p.fullName}">Patient</a>
+                            — <span class="text-muted" th:text="${p.phoneNumber}">phone</span>
+                        </li>
+                        <li th:if="${#lists.isEmpty(recentRegistrations)}" class="text-muted">No recent registrations.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/scripts.js}"></script>
+</body>
+</html>

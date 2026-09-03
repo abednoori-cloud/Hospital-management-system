@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Search Results')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></div>
+    <main class="main-content">
+        <div th:replace="~{fragments/navbar :: navbar}"></div>
+        <div class="page-body">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+            <div class="page-header">
+                <div>
+                    <h1>Search Results</h1>
+                    <p class="text-muted">Results for "<span th:text="${query}">query</span>"</p>
+                </div>
+            </div>
+
+            <div class="card-panel">
+                <div class="card-panel-header"><h2><i class="fa-solid fa-bed-pulse"></i> Patients</h2></div>
+                <ul class="simple-list">
+                    <li th:each="p : ${patients}">
+                        <a th:href="@{/patients/{id}(id=${p.id})}" th:text="${p.fullName}">Patient</a>
+                        — <span class="text-muted" th:text="${p.email}">email</span>
+                    </li>
+                    <li th:if="${#lists.isEmpty(patients)}" class="text-muted">No matching patients.</li>
+                </ul>
+            </div>
+
+            <div class="card-panel" sec:authorize="hasAnyRole('ADMIN','RECEPTIONIST')">
+                <div class="card-panel-header"><h2><i class="fa-solid fa-user-doctor"></i> Doctors</h2></div>
+                <ul class="simple-list">
+                    <li th:each="d : ${doctors}">
+                        <a th:href="@{/doctors/{id}(id=${d.id})}" th:text="${d.fullName}">Doctor</a>
+                        — <span class="text-muted" th:text="${d.specialization}">specialization</span>
+                    </li>
+                    <li th:if="${#lists.isEmpty(doctors)}" class="text-muted">No matching doctors.</li>
+                </ul>
+            </div>
+
+            <div class="card-panel">
+                <div class="card-panel-header"><h2><i class="fa-solid fa-calendar-check"></i> Appointments</h2></div>
+                <ul class="simple-list">
+                    <li th:each="a : ${appointments}">
+                        <span th:text="${a.patient.fullName}">Patient</span> with
+                        <span th:text="${a.doctor.fullName}">Doctor</span> —
+                        <span class="text-muted" th:text="${#temporals.format(a.appointmentDateTime, 'dd MMM yyyy, hh:mm a')}">Date</span>
+                    </li>
+                    <li th:if="${#lists.isEmpty(appointments)}" class="text-muted">No matching appointments.</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/scripts.js}"></script>
+</body>
+</html>

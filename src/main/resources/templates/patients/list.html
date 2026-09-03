@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Patients')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></div>
+    <main class="main-content">
+        <div th:replace="~{fragments/navbar :: navbar}"></div>
+        <div class="page-body">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+            <div class="page-header">
+                <div>
+                    <h1>Patients</h1>
+                    <p class="text-muted">Manage patient records, contact info, and history.</p>
+                </div>
+                <a th:href="@{/patients/new}" class="btn btn-primary" sec:authorize="hasAnyRole('ADMIN','RECEPTIONIST')"><i class="fa-solid fa-plus"></i> Add Patient</a>
+            </div>
+
+            <div class="card-panel">
+                <form th:action="@{/patients}" method="get" class="toolbar-search">
+                    <input type="text" name="keyword" th:value="${keyword}" placeholder="Search by name, email, or phone..." class="form-control"/>
+                    <button type="submit" class="btn btn-outline"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+                </form>
+
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Age</th>
+                            <th>Gender</th>
+                            <th>Blood Group</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="p : ${patientPage.content}">
+                            <td th:text="${p.id}">1</td>
+                            <td>
+                                <a th:href="@{/patients/{id}(id=${p.id})}" th:text="${p.fullName}">Name</a>
+                            </td>
+                            <td th:text="${p.email}">email</td>
+                            <td th:text="${p.phoneNumber}">phone</td>
+                            <td th:text="${p.age}">0</td>
+                            <td th:text="${p.gender}">Gender</td>
+                            <td th:text="${p.bloodGroup} ?: '—'">O+</td>
+                            <td class="text-end actions-cell">
+                                <a th:href="@{/patients/{id}(id=${p.id})}" class="btn-icon" title="View"><i class="fa-solid fa-eye"></i></a>
+                                <a th:href="@{/patients/{id}/edit(id=${p.id})}" class="btn-icon" title="Edit" sec:authorize="hasAnyRole('ADMIN','RECEPTIONIST')"><i class="fa-solid fa-pen"></i></a>
+                                <form th:action="@{/patients/{id}/delete(id=${p.id})}" method="post" class="d-inline" sec:authorize="hasRole('ADMIN')"
+                                      onsubmit="return confirm('Delete this patient? This cannot be undone.');">
+                                    <button type="submit" class="btn-icon btn-icon-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(patientPage.content)}">
+                            <td colspan="8" class="text-center text-muted">No patients found.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:replace="~{fragments/pagination :: pagination(${patientPage}, '/patients')}"></div>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/scripts.js}"></script>
+</body>
+</html>

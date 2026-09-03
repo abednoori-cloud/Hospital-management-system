@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<aside class="sidebar" th:fragment="sidebar(activePage)">
+    <div class="sidebar-brand">
+        <i class="fa-solid fa-staff-snake"></i>
+        <span>MediCore <small>HMS</small></span>
+    </div>
+
+    <nav class="sidebar-nav">
+        <!-- Dashboard: visible to everyone -->
+        <a th:href="@{/dashboard}" class="nav-link" th:classappend="${activePage == 'dashboard'} ? 'active'">
+            <i class="fa-solid fa-gauge-high"></i><span>Dashboard</span>
+        </a>
+
+        <!-- ============ ADMIN + RECEPTIONIST: Patients (full module) ============ -->
+        <a th:href="@{/patients}" class="nav-link" sec:authorize="hasAnyRole('ADMIN','RECEPTIONIST')"
+           th:classappend="${activePage == 'patients'} ? 'active'">
+            <i class="fa-solid fa-bed-pulse"></i><span>Patients</span>
+        </a>
+
+        <!-- ============ DOCTOR: My Patients (scoped, read-only) ============ -->
+        <a th:href="@{/patients}" class="nav-link" sec:authorize="hasRole('DOCTOR')"
+           th:classappend="${activePage == 'patients'} ? 'active'">
+            <i class="fa-solid fa-bed-pulse"></i><span>My Patients</span>
+        </a>
+
+        <!-- ============ ADMIN + RECEPTIONIST: Doctor directory ============ -->
+        <a th:href="@{/doctors}" class="nav-link" sec:authorize="hasAnyRole('ADMIN','RECEPTIONIST')"
+           th:classappend="${activePage == 'doctors'} ? 'active'">
+            <i class="fa-solid fa-user-doctor"></i><span>Doctors</span>
+        </a>
+
+        <!-- ============ ADMIN only: Receptionists (users filtered by role) ============ -->
+        <a th:href="@{/users(role='RECEPTIONIST')}" class="nav-link" sec:authorize="hasRole('ADMIN')"
+           th:classappend="${activePage == 'receptionists'} ? 'active'">
+            <i class="fa-solid fa-user-tie"></i><span>Receptionists</span>
+        </a>
+
+        <!-- ============ ADMIN only: Users (all accounts) ============ -->
+        <a th:href="@{/users}" class="nav-link" sec:authorize="hasRole('ADMIN')"
+           th:classappend="${activePage == 'users'} ? 'active'">
+            <i class="fa-solid fa-users-gear"></i><span>Users</span>
+        </a>
+
+        <!-- ============ Appointments: everyone, but scoped per role in the controller ============ -->
+        <a th:href="@{/appointments}" class="nav-link" sec:authorize="hasAnyRole('ADMIN','DOCTOR','RECEPTIONIST')"
+           th:classappend="${activePage == 'appointments'} ? 'active'">
+            <i class="fa-solid fa-calendar-check"></i><span>Appointments</span>
+        </a>
+
+        <!-- ============ ADMIN + DOCTOR: Medical Records ============ -->
+        <a th:href="@{/medical-records}" class="nav-link" sec:authorize="hasAnyRole('ADMIN','DOCTOR')"
+           th:classappend="${activePage == 'medical-records'} ? 'active'">
+            <i class="fa-solid fa-file-waveform"></i><span>Medical Records</span>
+        </a>
+
+        <!-- ============ DOCTOR only: Prescriptions (same data, prescription-focused view) ============ -->
+        <a th:href="@{/medical-records}" class="nav-link" sec:authorize="hasRole('DOCTOR')"
+           th:classappend="${activePage == 'prescriptions'} ? 'active'">
+            <i class="fa-solid fa-prescription"></i><span>Prescriptions</span>
+        </a>
+
+        <!-- ============ ADMIN + RECEPTIONIST: Invoices / Billing ============ -->
+        <a th:href="@{/invoices}" class="nav-link" sec:authorize="hasAnyRole('ADMIN','RECEPTIONIST')"
+           th:classappend="${activePage == 'invoices'} ? 'active'">
+            <i class="fa-solid fa-file-invoice-dollar"></i><span>Invoices</span>
+        </a>
+
+        <!-- ============ ADMIN only: Reports ============ -->
+        <a th:href="@{/reports}" class="nav-link" sec:authorize="hasRole('ADMIN')"
+           th:classappend="${activePage == 'reports'} ? 'active'">
+            <i class="fa-solid fa-chart-line"></i><span>Reports</span>
+        </a>
+
+        <!-- ============ ADMIN only: Settings ============ -->
+        <a th:href="@{/settings}" class="nav-link" sec:authorize="hasRole('ADMIN')"
+           th:classappend="${activePage == 'settings'} ? 'active'">
+            <i class="fa-solid fa-gear"></i><span>Settings</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <i class="fa-solid fa-shield-heart"></i>
+        <span>Secured with Spring Security</span>
+    </div>
+</aside>
+</body>
+</html>

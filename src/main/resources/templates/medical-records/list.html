@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Medical Records')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></div>
+    <main class="main-content">
+        <div th:replace="~{fragments/navbar :: navbar}"></div>
+        <div class="page-body">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+            <div class="page-header">
+                <div>
+                    <h1>Medical Records</h1>
+                    <p class="text-muted">Diagnosis, prescriptions, and visit history for every patient.</p>
+                </div>
+                <a th:href="@{/medical-records/new}" class="btn btn-primary" sec:authorize="hasRole('DOCTOR')"><i class="fa-solid fa-plus"></i> Add Record</a>
+            </div>
+
+            <div class="card-panel">
+                <form th:action="@{/medical-records}" method="get" class="toolbar-search">
+                    <input type="text" name="keyword" th:value="${keyword}" placeholder="Search by patient name or diagnosis..." class="form-control"/>
+                    <button type="submit" class="btn btn-outline"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+                </form>
+
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Visit Date</th>
+                            <th>Diagnosis</th>
+                            <th>Prescription</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="m : ${recordPage.content}">
+                            <td th:text="${m.id}">1</td>
+                            <td th:text="${m.patient.fullName}">Patient</td>
+                            <td th:text="${m.doctor.fullName}">Doctor</td>
+                            <td th:text="${#temporals.format(m.visitDate, 'dd MMM yyyy')}">Date</td>
+                            <td th:text="${m.diagnosis}">Diagnosis</td>
+                            <td th:text="${m.prescription} ?: '—'">Prescription</td>
+                            <td class="text-end actions-cell">
+                                <a th:href="@{/medical-records/{id}/edit(id=${m.id})}" class="btn-icon" title="Edit" sec:authorize="hasRole('DOCTOR')"><i class="fa-solid fa-pen"></i></a>
+                                <form th:action="@{/medical-records/{id}/delete(id=${m.id})}" method="post" class="d-inline" sec:authorize="hasRole('DOCTOR')"
+                                      onsubmit="return confirm('Delete this medical record? This cannot be undone.');">
+                                    <button type="submit" class="btn-icon btn-icon-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(recordPage.content)}">
+                            <td colspan="7" class="text-center text-muted">No medical records found.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:replace="~{fragments/pagination :: pagination(${recordPage}, '/medical-records')}"></div>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/scripts.js}"></script>
+</body>
+</html>

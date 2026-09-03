@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Settings')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></div>
+    <main class="main-content">
+        <div th:replace="~{fragments/navbar :: navbar}"></div>
+        <div class="page-body">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+            <div class="page-header">
+                <div>
+                    <h1>Hospital Settings</h1>
+                    <p class="text-muted">General configuration for the hospital system.</p>
+                </div>
+            </div>
+
+            <div class="card-panel form-panel">
+                <div class="card-panel-header"><h2><i class="fa-solid fa-hospital"></i> General Information</h2></div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Hospital Name</label>
+                        <input type="text" class="form-control" value="MediCore Hospital" disabled/>
+                    </div>
+                    <div class="form-group">
+                        <label>Time Zone</label>
+                        <input type="text" class="form-control" value="Server default" disabled/>
+                    </div>
+                    <div class="form-group">
+                        <label>Default Currency</label>
+                        <input type="text" class="form-control" value="USD ($)" disabled/>
+                    </div>
+                    <div class="form-group">
+                        <label>Appointment Slot Length</label>
+                        <input type="text" class="form-control" value="30 minutes" disabled/>
+                    </div>
+                </div>
+                <p class="text-muted" style="margin-top: 16px;">
+                    <i class="fa-solid fa-circle-info"></i>
+                    This is a read-only preview. Persisted, editable hospital-wide settings
+                    (branding, working hours, department list, notification rules, etc.)
+                    can be added here as a future enhancement — this screen already
+                    demonstrates the ADMIN-only access boundary required for it.
+                </p>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/scripts.js}"></script>
+</body>
+</html>

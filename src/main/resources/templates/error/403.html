@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Access Denied')}"></head>
+<body class="auth-body">
+<div class="error-wrapper">
+    <div class="error-card">
+        <i class="fa-solid fa-lock error-icon"></i>
+        <h1>403</h1>
+        <h2>Access Denied</h2>
+        <p th:text="${errorMessage} ?: 'You do not have permission to view this page.'">Message</p>
+        <a th:href="@{/dashboard}" class="btn btn-primary"><i class="fa-solid fa-house"></i> Back to Dashboard</a>
+    </div>
+</div>
+</body>
+</html>
