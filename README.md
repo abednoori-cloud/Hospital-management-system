@@ -209,7 +209,23 @@ hospital-management-system/
 
 ## 📸 Screenshots
 
-_Add screenshots of the Dashboard, Patients list, Appointment booking form, and Invoice receipt here once you run the app locally — this section is intentionally left for you to fill in with your own captures for your portfolio/GitHub README._
+### Login
+![Login](Screenshots/Login-page.png)
+
+### Admin Dashboard
+![Admin Dashboard](Screenshots/Admin-dashboard.png)
+
+### Doctor Dashboard
+![Doctor Dashboard](Screenshots/Doctor-Dashbaord.png)
+
+### Patients
+![Patients List](Screenshots/Patients-list-page.png)
+
+### Reception-Dashboard
+![Reception Dasboard](Screenshots/Reception-Dashboard.png)
+
+### Appointments Booking
+![Appointments Booking Form](Screenshots/Appointments-booking-form.png)
 
 ---
 
